@@ -3,7 +3,19 @@ const csvParser = require('csv-parser');
 const readline = require('readline');
 const filterCSVList = require('./filterCSVList');
 const { error } = require('console');
-const filePath = './completeUfoList.csv';
+// const filePath = './completeUfoList.csv';
+const fileName = 'completeUfoList.csv';
+
+const command = process.argv[1];
+process.argv.forEach((item) =>{
+    console.log("this is each argument ", item);
+})
+console.log("Command we want: ", command);
+const filePath = command.replace('index.js',fileName)
+console.log("Command we have: ", filePath);
+
+
+
 
 // Define arrays to be used later
 const CSVresults = [];
@@ -71,38 +83,35 @@ const rl = readline.createInterface({
     }
   }
 
-  function filterData(stateParam,yearParam){
-    return new Promise((resolve, reject) =>{
+  function filterData(stateParam, yearParam) {
+    return new Promise((resolve, reject) => {
       const CSVresults = [];
-
+  
       fs.createReadStream(filePath)
-      .pipe(csvParser())
-      .on('data', (data) => {
-      CSVresults.push(data);
-      })
-      .on('end', () => {
-      filteredList = filterCSVList.filterCSVList(CSVresults, stateParam, yearParam  );
-      // console.log("filtered LIst:", filteredList);
-      console.log('CSV file successfully parsed.');
-      resolve(filteredList)
-      })
-      .on('error', (error) => {
-      console.error('Error parsing CSV file:', error);
-      reject(error);
-      });
-
+        .pipe(csvParser())
+        .on('data', (data) => {
+          CSVresults.push(data);
+        })
+        .on('end', () => {
+          const filteredList = filterCSVList.filterCSVList(CSVresults, stateParam, yearParam);
+          console.log('CSV file successfully parsed.');
+          resolve(filteredList);
+        })
+        .on('error', (error) => {
+          console.error('Error parsing CSV file:', error);
+          reject(error);
+        });
     });
-     
   }
 
-async function callFilterCSVList(chosenState,chosenYear){
-  try {
-    filteredResults =  await filterData(chosenState,chosenYear); // call the filter data funciton
-    return filteredResults;
-  }catch (error){
-    throw new Error('Error filtering CSV Data:' + error.message);
+  async function callFilterCSVList(chosenState, chosenYear) {
+    try {
+      const filteredResults = await filterData(chosenState, chosenYear);
+      return filteredResults;
+    } catch (error) {
+      throw new Error('Error filtering CSV data: ' + error.message);
+    }
   }
-}
 
 async function promptUser(){
   let chosenState = '';
@@ -160,30 +169,5 @@ async function promptUser(){
 
 }
 
-
-  
-    function filterData(stateParam,yearParam){
-      return new Promise((resolve, reject) =>{
-        const CSVresults = [];
-
-        fs.createReadStream(filePath)
-        .pipe(csvParser())
-        .on('data', (data) => {
-        CSVresults.push(data);
-        })
-        .on('end', () => {
-        filteredList = filterCSVList.filterCSVList(CSVresults, stateParam, yearParam  );
-        // console.log("filtered LIst:", filteredList);
-        console.log('CSV file successfully parsed.');
-        resolve(filteredList)
-        })
-        .on('error', (error) => {
-        console.error('Error parsing CSV file:', error);
-        reject(error);
-        });
-
-      });
-       
-    }
 
     promptUser();
