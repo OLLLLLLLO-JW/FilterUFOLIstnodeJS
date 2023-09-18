@@ -25,7 +25,7 @@ const lettersOnlyString = /^[a-z]+$/i;
 const currentDate = new Date();
 const currentYear = currentDate.getFullYear();
 let filteredData = [];
-let lowerCaseInputThree;
+let lowerCaseInputThree; // clean up used things
 let filteredResults = [];
 let filteredList = [];
 
@@ -152,7 +152,7 @@ async function promptUser(){
   while(!validFinalAnswer){
     console.log("inside final answer");
     finalAnswer = await askQuestion('Is this data correct? yes or no?')
-    finalAnswer = finalAnswer.toLowerCase();
+    finalAnswer = finalAnswer.toLowerCase(); // trim answer to get spaces surrounding no and y and n
     if (finalAnswer === 'yes' || finalAnswer === 'no'){
       console.log("correct answer! ", finalAnswer);
       validFinalAnswer = true;
