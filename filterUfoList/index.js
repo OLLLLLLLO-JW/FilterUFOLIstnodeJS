@@ -3,6 +3,7 @@ const csvParser = require('csv-parser');
 const readline = require('readline');
 const filterCSVList = require('./filterCSVList');
 const { error } = require('console');
+const writeToCSV = require('./writeToCSV');
 // const filePath = './completeUfoList.csv';
 const fileName = 'completeUfoList.csv';
 
@@ -18,21 +19,17 @@ console.log("Command we have: ", filePath);
 
 
 // Define arrays to be used later
-const CSVresults = [];
-let stateLowerCase; 
 let fullYear;
 const lettersOnlyString = /^[a-z]+$/i;
 const currentDate = new Date();
 const currentYear = currentDate.getFullYear();
 let filteredData = [];
-let lowerCaseInputThree; // clean up used things
-let filteredResults = [];
-let filteredList = [];
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
+
 
   function askQuestion(question){
     return new Promise((resolve) => {
@@ -113,6 +110,7 @@ const rl = readline.createInterface({
     }
   }
 
+  // Start Asking Questions
 async function promptUser(){
   let chosenState = '';
   let chosenYear;
@@ -120,12 +118,12 @@ async function promptUser(){
   let validState = false;
   let validYear = false;
   let validFinalAnswer = false;
-  let isDataFiltered = false;
 
   try {
+
   while( !validState){
    chosenState = await askQuestion('Choose a state using abbreviation ');
-   chosenState = chosenState.toLowerCase();
+   chosenState = chosenState.toLowerCase().trim();
    validState = validateState(chosenState);
    if (!validState){
       console.log('Please enter a valid state.');
@@ -145,19 +143,17 @@ async function promptUser(){
 
   filteredData =   await callFilterCSVList(chosenState,chosenYear); // call the filter data funciton
   console.log("filteredData: ", filteredData);
-  // console.log("after fiilterd data");
-  // console.log(filteredData);
-
   
   while(!validFinalAnswer){
-    console.log("inside final answer");
     finalAnswer = await askQuestion('Is this data correct? yes or no?')
-    finalAnswer = finalAnswer.toLowerCase(); // trim answer to get spaces surrounding no and y and n
-    if (finalAnswer === 'yes' || finalAnswer === 'no'){
-      console.log("correct answer! ", finalAnswer);
+    finalAnswer = finalAnswer.toLowerCase(); 
+    finalAnswer = finalAnswer.trim();
+    if (finalAnswer === 'yes' || finalAnswer === 'no' || finalAnswer === 'n' || finalAnswer === 'y'){
+      writeToCSV.writeToCSV(filteredData,`${chosenState} - ${chosenYear}`);
+      console.log("File Created")
       validFinalAnswer = true;
     } else {
-      console.log("try again", finalAnswer);
+      console.log("No data saved");
       console.log(filteredData);
     }
   }
